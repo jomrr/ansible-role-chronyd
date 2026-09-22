@@ -3,6 +3,8 @@
 # file: handlers/main.yml
 
 - name: "CHRONYD | Restart service"
+  become: true
+  become_user: root
   ansible.builtin.service:
     name: "{{ __chronyd_service }}"
     state: restarted
