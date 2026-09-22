@@ -5,6 +5,15 @@
 - name: "CHRONYD | Load platform variables"
   ansible.builtin.include_vars: "{{ role_path }}/vars/{{ ansible_facts.os_family }}.yml"
 
+- name: "CHRONYD | Validate start options"
+  ansible.builtin.assert:
+    that:
+      - not ('-4' in chronyd_options and '-6' in chronyd_options)
+      - chronyd_options | select('search', '\s') | list | length == 0
+      - "'' not in chronyd_options"
+    fail_msg: Use nonempty, whitespace-free argument tokens and choose at most one of -4 and -6.
+    quiet: true
+
 - name: "CHRONYD | Remove conflicting packages"
   become: true
   become_user: root
@@ -64,6 +73,22 @@
     mode: "0644"
     backup: true
     validate: "{{ __chronyd_validate }}"
+  notify: restart daemon
+
+- name: "CHRONYD | Write start options"
+  become: true
+  become_user: root
+  ansible.builtin.lineinfile:
+    path: "{{ __chronyd_options_file }}"
+    regexp: "^{{ __chronyd_options_variable }}="
+    line: >-
+      {{ __chronyd_options_variable }}={{
+      ((__chronyd_options_defaults if chronyd_options_mode == 'append' else []) + chronyd_options) | join(' ') | quote }}
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
   notify: restart daemon
 
 - name: "CHRONYD | Enable and start service"

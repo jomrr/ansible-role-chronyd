@@ -2,6 +2,15 @@
 # role: chronyd
 # file: defaults/main.yml
 
+# Policy for combining package defaults with chronyd_options.
+# Choices: append, replace
+chronyd_options_mode: append
+
+# Additional or replacement chronyd command-line argument tokens.
+chronyd_options: []
+# chronyd_options:
+#   - "-4"
+
 # Ordered access directives; explicit deny entries below are applied afterwards.
 chronyd_directives: []
 # chronyd_directives:

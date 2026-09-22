@@ -35,7 +35,7 @@
           [Service]
           Type=simple
           ExecStart=
-          ExecStart=!/usr/sbin/chronyd -n -x -f {{ __chronyd_conf }}
+          ExecStart=!/usr/sbin/chronyd -n -x -f {{ __chronyd_conf }} ${{ __chronyd_options_variable }}
 
     - name: "CHRONYD | Load test service overrides"
       ansible.builtin.systemd_service:

@@ -7,6 +7,9 @@ __chronyd_packages:
   - tzdata
 __chronyd_remove_packages:
   - ntp
+__chronyd_options_file: /etc/default/chrony
+__chronyd_options_variable: DAEMON_OPTS
+__chronyd_options_defaults: ["-F", "1"]
 __chronyd_conf: /etc/chrony/chrony.conf
 __chronyd_service: chrony
 __chronyd_conflicting_services:

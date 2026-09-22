@@ -9,6 +9,11 @@
     - name: "CHRONYD | Load platform service paths"
       ansible.builtin.include_vars: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}/vars/{{ ansible_facts.os_family }}.yml"
 
+    - name: "CHRONYD | Verify restored package start options"
+      ansible.builtin.import_tasks: ../tasks/verify_options.yml
+      vars:
+        __chronyd_expected_options: "{{ __chronyd_options_defaults }}"
+
     - name: "CHRONYD | Query configured runtime sources"
       ansible.builtin.command: chronyc -n -c sources
       changed_when: false
@@ -19,10 +24,6 @@
         that:
           - "'192.0.2.123' in __chronyd_sources.stdout"
         quiet: true
-
-    - name: "CHRONYD | Verify service enablement"
-      ansible.builtin.command: "systemctl is-enabled {{ __chronyd_service }}"
-      changed_when: false
 
     - name: "CHRONYD | Verify client mode leaves the NTP server port unused"
       ansible.builtin.command:

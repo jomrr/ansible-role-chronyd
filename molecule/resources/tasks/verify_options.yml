@@ -1,0 +1,30 @@
+---
+# role: chronyd
+# file: molecule/resources/tasks/verify_options.yml
+
+- name: "CHRONYD | Read service status"
+  ansible.builtin.systemd_service:
+    name: "{{ __chronyd_service }}"
+  register: __chronyd_service_status
+
+- name: "CHRONYD | Read the daemon arguments"
+  become: true
+  become_user: root
+  ansible.builtin.slurp:
+    src: "/proc/{{ __chronyd_service_status.status.MainPID }}/cmdline"
+  register: __chronyd_cmdline
+
+- name: "CHRONYD | Assert effective daemon arguments"
+  ansible.builtin.assert:
+    that:
+      - __chronyd_service_status.status.UnitFileState == 'enabled'
+      - >-
+        (__chronyd_cmdline.content | b64decode).split('\x00')[:-1] ==
+        ['/usr/sbin/chronyd', '-n', '-x', '-f', __chronyd_conf] + __chronyd_expected_options
+    quiet: true
+
+- name: "CHRONYD | Verify daemon access through its Unix socket"
+  become: true
+  become_user: root
+  ansible.builtin.command: chronyc -h /run/chrony/chronyd.sock tracking
+  changed_when: false

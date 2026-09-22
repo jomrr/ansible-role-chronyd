@@ -7,6 +7,9 @@ __chronyd_packages:
   - tzdata
 __chronyd_remove_packages:
   - ntp
+__chronyd_options_file: /etc/sysconfig/chronyd
+__chronyd_options_variable: OPTIONS
+__chronyd_options_defaults: ["-F", "2"]
 __chronyd_conf: /etc/chrony.conf
 __chronyd_service: chronyd
 __chronyd_conflicting_services: []

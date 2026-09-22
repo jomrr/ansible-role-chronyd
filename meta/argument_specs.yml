@@ -6,6 +6,22 @@ argument_specs:
   main:
     short_description: Install, configure, enable, and start chronyd.
     options:
+      chronyd_options_mode:
+        type: str
+        default: append
+        choices:
+          - append
+          - replace
+        description:
+          - Policy for combining package defaults with chronyd_options.
+      chronyd_options:
+        type: list
+        elements: str
+        default: []
+        description:
+          - Additional or replacement chronyd command-line argument tokens.
+          - Use one whitespace-free token per entry; IPv4-only (-4) and IPv6-only (-6) are
+            mutually exclusive.
       chronyd_directives:
         type: list
         default: []

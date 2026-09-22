@@ -62,10 +62,43 @@
       ansible.builtin.include_role:
         name: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}"
 
-    - name: "CHRONYD | Verify the restored daemon responds"
-      ansible.builtin.command: chronyc tracking
-      changed_when: false
+    - name: "CHRONYD | Verify the restored service and start options"
+      ansible.builtin.import_tasks: ../tasks/verify_options.yml
+      vars:
+        __chronyd_expected_options: "{{ __chronyd_options_defaults }}"
 
-    - name: "CHRONYD | Verify the restored service is enabled"
-      ansible.builtin.command: "systemctl is-enabled {{ __chronyd_service }}"
-      changed_when: false
+- name: "CHRONYD | Append IPv4-only start options"
+  hosts: all
+  gather_facts: true
+  vars:
+    chronyd_options_mode: append
+    chronyd_options: ["-4"]
+    chronyd_ntp_pools: []
+    chronyd_ntp_servers: []
+    chronyd_port: 0
+    chronyd_cmdport: 0
+  roles:
+    - role: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+  tasks:
+    - name: "CHRONYD | Verify appended start options"
+      ansible.builtin.import_tasks: ../tasks/verify_options.yml
+      vars:
+        __chronyd_expected_options: "{{ __chronyd_options_defaults + ['-4'] }}"
+
+- name: "CHRONYD | Replace start options with IPv6-only"
+  hosts: all
+  gather_facts: true
+  vars:
+    chronyd_options_mode: replace
+    chronyd_options: ["-6"]
+    chronyd_ntp_pools: []
+    chronyd_ntp_servers: []
+    chronyd_port: 0
+    chronyd_cmdport: 0
+  roles:
+    - role: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+  tasks:
+    - name: "CHRONYD | Verify replaced start options"
+      ansible.builtin.import_tasks: ../tasks/verify_options.yml
+      vars:
+        __chronyd_expected_options: ["-6"]
